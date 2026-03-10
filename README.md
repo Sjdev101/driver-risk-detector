@@ -14,11 +14,22 @@ All events are logged with a timestamp and confidence score.
 ```
 Camera Feed
     ↓
-Face Mesh (MediaPipe) → 468 landmarks
+┌─────────────────────────────────┐
+│ Face Mesh (MediaPipe)           │
+│ 468 landmarks                   │
+│   ↓                             │
+│ Eye Landmarks → EAR Calculation │
+│   ↓                             │
+│ Drowsiness Analyzer             │
+└─────────────────────────────────┘
     ↓
-Eye Landmarks → EAR Calculation
+┌─────────────────────────────────┐
+│ YOLOv8 Phone Detector           │
+│   ↓                             │
+│ Phone Analyzer                  │
+└─────────────────────────────────┘
     ↓
-Decision Engine → DROWSY / ALERT
+Decision Engine → DROWSY / ALERT / PHONE
     ↓
 Event Logger → timestamp, type, confidence
 ```
