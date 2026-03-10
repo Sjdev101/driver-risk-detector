@@ -1,7 +1,7 @@
 # Driver Risk Detector
 > Real-time driver monitoring system using computer vision
 
-![CI](https://github.com/YOUR_USERNAME/driver-risk-detector/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/Sjdev101/driver-risk-detector/actions/workflows/ci.yml/badge.svg)
 
 ## What it does
 Monitors a driver through a camera feed and detects two risk events in real time:
