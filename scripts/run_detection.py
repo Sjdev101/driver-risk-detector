@@ -1,13 +1,16 @@
 import cv2
 from src.detection import detect_face, get_eye_landmarks, calculate_ear, calibrate_ear
+from src.analyzer import DrowsinessAnalyzer
 
 FRAME_THRESHOLD = 20
 
 cap = cv2.VideoCapture(0)
-drowsy_counter = 0
 
 # Calibrate to your face first
 EAR_THRESHOLD = calibrate_ear(cap, detect_face, get_eye_landmarks, calculate_ear)
+
+# Initialize the decision engine
+analyzer = DrowsinessAnalyzer(ear_threshold=EAR_THRESHOLD, frame_threshold=FRAME_THRESHOLD)
 
 while True:
     ret, frame = cap.read()
@@ -27,21 +30,21 @@ while True:
             right_ear = calculate_ear(right_eye)
             avg_ear = (left_ear + right_ear) / 2.0
 
+            # Update decision engine
+            analyzer.update(avg_ear)
+            status = analyzer.get_status()
+
+            # Draw eye landmarks
             for point in left_eye + right_eye:
                 cv2.circle(frame, point, 2, (0, 255, 0), -1)
 
+            # Display EAR and status
             cv2.putText(frame, f"EAR: {avg_ear:.2f}", (30, 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
-            cv2.putText(frame, f"Threshold: {EAR_THRESHOLD:.2f}", (30, 60),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
 
-            if avg_ear < EAR_THRESHOLD:
-                drowsy_counter += 1
-                if drowsy_counter >= FRAME_THRESHOLD:
-                    cv2.putText(frame, "DROWSY!", (30, 100),
-                                cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
-            else:
-                drowsy_counter = 0
+            color = (0, 0, 255) if status == "DROWSY" else (0, 255, 0)
+            cv2.putText(frame, status, (30, 70),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1.0, color, 3)
 
     cv2.imshow("Driver Monitor", frame)
 
