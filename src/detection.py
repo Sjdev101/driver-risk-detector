@@ -1,12 +1,12 @@
 import cv2
 import mediapipe as mp
+from scipy.spatial import distance
 
 mp_face = mp.solutions.face_mesh.FaceMesh(max_num_faces=1)
-mp_draw = mp.solutions.drawing_utils
 
-# MediaPipe landmark indices for each eye
-LEFT_EYE = [362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398]
-RIGHT_EYE = [33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246]
+# 6 points per eye: [left corner, top-left, top-right, right corner, bottom-right, bottom-left]
+LEFT_EYE  = [362, 385, 387, 263, 373, 380]
+RIGHT_EYE = [33, 160, 158, 133, 153, 144]
 
 def detect_face(frame):
     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -27,3 +27,13 @@ def get_eye_landmarks(face_landmarks, frame_shape):
         right_eye.append((int(lm.x * w), int(lm.y * h)))
 
     return left_eye, right_eye
+
+def calculate_ear(eye_landmarks):
+    # Vertical distances (2 pairs)
+    A = distance.euclidean(eye_landmarks[1], eye_landmarks[5])
+    B = distance.euclidean(eye_landmarks[2], eye_landmarks[4])
+    # Horizontal distance
+    C = distance.euclidean(eye_landmarks[0], eye_landmarks[3])
+
+    ear = (A + B) / (2.0 * C)
+    return ear
