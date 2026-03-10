@@ -5,6 +5,7 @@ class DrowsinessAnalyzer:
         self.drowsy_counter = 0
         self.is_drowsy = False
         self.prev_status = "ALERT"
+        self.phone_was_detected=False
 
     def update(self, ear):
         if ear < self.ear_threshold:
@@ -28,4 +29,16 @@ class DrowsinessAnalyzer:
             self.prev_status = current_status
             return True
         self.prev_status = current_status
+        return False
+
+class PhoneAnalyzer:
+    def __init__(self):
+        self.phone_was_detected = False
+
+    def is_new_event(self, phones_detected):
+        if len(phones_detected) > 0 and not self.phone_was_detected:
+            self.phone_was_detected = True
+            return True
+        elif len(phones_detected) == 0:
+            self.phone_was_detected = False
         return False

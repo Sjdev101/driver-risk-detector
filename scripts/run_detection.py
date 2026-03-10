@@ -1,6 +1,7 @@
 import cv2
+from src.phone_detection import PhoneDetector
 from src.detection import detect_face, get_eye_landmarks, calculate_ear, calibrate_ear
-from src.analyzer import DrowsinessAnalyzer
+from src.analyzer import DrowsinessAnalyzer,PhoneAnalyzer
 from src.logger import EventLogger
 
 FRAME_THRESHOLD = 20
@@ -13,7 +14,13 @@ EAR_THRESHOLD = calibrate_ear(cap, detect_face, get_eye_landmarks, calculate_ear
 # Initialize the decision engine
 analyzer = DrowsinessAnalyzer(ear_threshold=EAR_THRESHOLD, frame_threshold=FRAME_THRESHOLD)
 
+phone_analyzer = PhoneAnalyzer()
+
+#Initialize the event logger
 logger = EventLogger()
+
+#Initialize the phone detector
+phone_detector = PhoneDetector()
 
 while True:
     ret, frame = cap.read()
@@ -51,6 +58,20 @@ while True:
             color = (0, 0, 255) if status == "DROWSY" else (0, 255, 0)
             cv2.putText(frame, status, (30, 70),
                         cv2.FONT_HERSHEY_SIMPLEX, 1.0, color, 3)
+            
+
+            # Phone detection
+            phones = phone_detector.detect(frame)
+            for phone in phones:
+                x1, y1, x2, y2 = phone["bbox"]
+                conf = phone["confidence"]
+                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), 2)
+                cv2.putText(frame, f"Phone {conf:.2f}", (x1, y1 - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                
+                if phone_analyzer.is_new_event(phones):
+                    logger.log_event("PHONE_DETECTED", phones[0]["confidence"])
+    
 
     cv2.imshow("Driver Monitor", frame)
 
