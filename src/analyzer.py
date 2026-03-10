@@ -4,6 +4,7 @@ class DrowsinessAnalyzer:
         self.frame_threshold = frame_threshold
         self.drowsy_counter = 0
         self.is_drowsy = False
+        self.prev_status = "ALERT"
 
     def update(self, ear):
         if ear < self.ear_threshold:
@@ -20,3 +21,11 @@ class DrowsinessAnalyzer:
         if self.is_drowsy:
             return "DROWSY"
         return "ALERT"
+
+    def is_new_event(self):
+        current_status = self.get_status()
+        if current_status == "DROWSY" and self.prev_status == "ALERT":
+            self.prev_status = current_status
+            return True
+        self.prev_status = current_status
+        return False

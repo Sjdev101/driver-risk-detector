@@ -1,6 +1,7 @@
 import cv2
 from src.detection import detect_face, get_eye_landmarks, calculate_ear, calibrate_ear
 from src.analyzer import DrowsinessAnalyzer
+from src.logger import EventLogger
 
 FRAME_THRESHOLD = 20
 
@@ -11,6 +12,8 @@ EAR_THRESHOLD = calibrate_ear(cap, detect_face, get_eye_landmarks, calculate_ear
 
 # Initialize the decision engine
 analyzer = DrowsinessAnalyzer(ear_threshold=EAR_THRESHOLD, frame_threshold=FRAME_THRESHOLD)
+
+logger = EventLogger()
 
 while True:
     ret, frame = cap.read()
@@ -41,6 +44,9 @@ while True:
             # Display EAR and status
             cv2.putText(frame, f"EAR: {avg_ear:.2f}", (30, 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+            
+            if analyzer.is_new_event():
+                 logger.log_event("DROWSY", avg_ear)
 
             color = (0, 0, 255) if status == "DROWSY" else (0, 255, 0)
             cv2.putText(frame, status, (30, 70),
