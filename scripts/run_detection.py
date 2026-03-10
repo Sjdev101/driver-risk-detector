@@ -1,6 +1,6 @@
 import cv2
 import mediapipe as mp
-from src.detection import detect_face
+from src.detection import detect_face, get_eye_landmarks
 
 mp_draw = mp.solutions.drawing_utils
 mp_face = mp.solutions.face_mesh
@@ -19,11 +19,11 @@ while True:
 
     if results.multi_face_landmarks:
         for face_landmarks in results.multi_face_landmarks:
-            mp_draw.draw_landmarks(
-                frame,
-                face_landmarks,
-                mp_face.FACEMESH_CONTOURS
-            )
+            left_eye, right_eye = get_eye_landmarks(face_landmarks, frame.shape)
+
+            # Draw eye landmarks as green dots
+            for point in left_eye + right_eye:
+                cv2.circle(frame, point, 2, (0, 255, 0), -1)
 
     cv2.imshow("Driver Monitor", frame)
 
