@@ -48,12 +48,4 @@ python -m scripts.run_detection
 ```
 ```
 
-Replace `YOUR_USERNAME` with your actual GitHub username, save it, then commit:
-```
-git add .
-```
-```
-git commit -m "docs: add project README with architecture and benchmarks"
-```
-```
-git push origin main
+Replace `YOUR_USERNAME` with your actual GitHub username, save it, then commit
