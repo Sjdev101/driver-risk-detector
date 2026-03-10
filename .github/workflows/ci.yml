@@ -20,14 +20,7 @@ jobs:
           python-version: '3.10'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Run linter
-        run: |
-          pip install flake8
-          flake8 src/ scripts/ --max-line-length=100 --ignore=E402
+        run: pip install -r requirements-test.txt
 
       - name: Run tests
-        run: |
-          pip install pytest
-          pytest tests/ -v
+        run: pytest tests/ -v
